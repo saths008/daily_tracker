@@ -6,14 +6,53 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
 public class SpreadSheetController {
 
-    public void readSpreadSheet(String filePath) {
-        try {
+    @FXML
+    private TextField filePathTextField;
 
+    @FXML
+    private TextField headersTextField;
+
+    @FXML
+    private TextField valuesTextField;
+
+    @FXML
+    private Label updateDailyMessageLabel;
+
+    @FXML
+    private Label initialiseSpreadSheetMessageLabel;
+
+    @FXML
+    public void selectFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select File");
+        Stage stage = (Stage) filePathTextField.getScene().getWindow();
+        File selectedFile = fileChooser.showOpenDialog(stage);
+        if (selectedFile != null) {
+            filePathTextField.setText(selectedFile.getAbsolutePath());
+        }
+    }
+
+    @FXML
+    private void goHome(ActionEvent event) throws IOException {
+        App.setRoot("main");
+    }
+
+    public void readSpreadSheet() {
+        try {
+            String filePath = filePathTextField.getText();
             File file = new File(
                     filePath);
             System.out.println(file.getName());
@@ -31,7 +70,10 @@ public class SpreadSheetController {
         }
     }
 
-    public void initialiseSpreadSheet(String filePath, String[] headers) {
+    @FXML
+    public void initialiseSpreadSheet() {
+        String filePath = filePathTextField.getText();
+        String[] headers = headersTextField.getText().split(",");
         XSSFWorkbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Daily Tracker");
         Row row = sheet.createRow(0);
@@ -48,8 +90,10 @@ public class SpreadSheetController {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             workbook.write(fileOutputStream);
             fileOutputStream.close();
+            initialiseSpreadSheetMessageLabel.setText("Spreadsheet initialisation successful");
         } catch (Exception e) {
             System.out.println(e.toString());
+            initialiseSpreadSheetMessageLabel.setText("Spreadsheet initialisation failed");
         } finally {
             try {
                 workbook.close();
@@ -64,7 +108,8 @@ public class SpreadSheetController {
      * @param filePath Path to the spreadsheet
      * @return ArrayList of headers
      */
-    public ArrayList<String> readSpreadSheetHeaders(String filePath) {
+    public ArrayList<String> readSpreadSheetHeaders() {
+        String filePath = filePathTextField.getText();
         ArrayList<String> headers = new ArrayList<>();
         try {
             File file = new File(filePath);
@@ -120,11 +165,18 @@ public class SpreadSheetController {
      * 
      * @param filePath Path to the spreadsheet
      * @param values   Array of values to be added to the spreadsheet
-     * @return boolean on whether the operation was successful
      */
-    public boolean addDailyUpdateDefault(String filePath, String[] values) {
+    @FXML
+    public void addDailyUpdateDefault() {
+        String filePath = filePathTextField.getText();
+        String[] values = valuesTextField.getText().split(",");
         Date date = new Date();
-        return addDailyUpdateController(filePath, date.toString(), values);
+        boolean success = addDailyUpdateController(filePath, date.toString(), values);
+        if (success) {
+            updateDailyMessageLabel.setText("Daily update added successfully");
+        } else {
+            updateDailyMessageLabel.setText("Error adding daily update");
+        }
     }
 
 }
