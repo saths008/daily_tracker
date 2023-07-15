@@ -1,3 +1,5 @@
 .idea
 daily-tracker/target/*
 daily_tracker/target/
+daily-tracker/src/main/resources/app.properties
+daily-tracker/src/main/resources/xslxdoc.xlsx

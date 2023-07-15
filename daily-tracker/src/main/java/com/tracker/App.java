@@ -33,8 +33,7 @@ public class App extends Application {
 
     public static void main(String[] args) {
         System.out.println("Main method running");
-        SpreadSheetController spreadSheetController = new SpreadSheetController();
-        // spreadSheetController.initialiseSpreadSheet();
+        // SpreadSheetController spreadSheetController = new SpreadSheetController();
         launch();
     }
 
