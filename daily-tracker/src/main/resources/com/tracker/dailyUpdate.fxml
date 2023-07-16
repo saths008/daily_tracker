@@ -14,7 +14,8 @@
       <Label text="FilePath:" />
          <TextField fx:id="filePathTextField" />
          <Button text="Select File" onAction="#selectFile" />
-
+         <Label text="Headers Found:"/>
+      <Label fx:id="headersFoundLabel" />
       <Label text="Values:" />
       <TextField fx:id="valuesTextField" />
 

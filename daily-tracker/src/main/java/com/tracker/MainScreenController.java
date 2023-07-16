@@ -14,4 +14,9 @@ public class MainScreenController {
     private void goToInitialiseSpreadSheet() throws IOException {
         App.setRoot("initialiseSpreadSheet");
     }
+
+    @FXML
+    private void goToStats() throws IOException {
+        App.setRoot("stats");
+    }
 }

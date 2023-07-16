@@ -9,6 +9,7 @@
     <children>
         <Button fx:id="secondaryButton" text="Add Daily Update" onAction="#goToDailyUpdate" />
          <Button fx:id="secondaryButton" text="Initialise SpreadSheet" onAction="#goToInitialiseSpreadSheet" />
+          <Button fx:id="secondaryButton" text="Statistics" onAction="#goToStats" />
     </children>
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
