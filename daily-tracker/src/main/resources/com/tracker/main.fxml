@@ -7,15 +7,8 @@
 
 <VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tracker.MainScreenController">
     <children>
-        <Button fx:id="secondaryButton" text="Add Daily Update" onAction="#goToDailyUpdate">
-            <style>
-        -fx-background-color: #4CAF50;
-        -fx-text-fill: white;
-        -fx-padding: 10px 20px;
-        -fx-font-size: 14px;
-        -fx-border-radius: 4px;
-    </style>
-    </Button>
+    <Label text="Daily Tracker" />
+        <Button fx:id="secondaryButton" text="Add Daily Update" onAction="#goToDailyUpdate"/>
          <Button fx:id="secondaryButton" text="Initialise SpreadSheet" onAction="#goToInitialiseSpreadSheet" />
           <Button fx:id="secondaryButton" text="Statistics" onAction="#goToStats" />
     </children>
