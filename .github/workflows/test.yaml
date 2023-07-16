@@ -16,10 +16,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Java
+      - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 17
+          java-version: 17.0.6
+          distribution: "temurin"
 
       - name: Build with Maven
         working-directory: daily-tracker
