@@ -1,6 +1,7 @@
 # Daily Tracker
 
 GUI application to track stats you want.
+![mainPage](./doc_screenshot/mainPage.png)
 
 ## Set Up
 
