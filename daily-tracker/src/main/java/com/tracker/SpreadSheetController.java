@@ -8,22 +8,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.ResourceBundle;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -51,81 +40,9 @@ public class SpreadSheetController implements Initializable {
     @FXML
     private VBox lineChartContainer;
 
-    public List<String> formatDates(List<String> dates) {
-        String regexPattern = "^(\\S+ \\S+ \\d{1,2}) .* (\\d{4})$";
-        Pattern pattern = Pattern.compile(regexPattern);
-        for (int i = 0; i < dates.size(); i++) {
-            String date = dates.get(i);
-            System.out.println(date);
-            Matcher matcher = pattern.matcher(date);
-            String formattedDate = "";
-            if (matcher.find()) {
-                formattedDate = matcher.group(1);
-                String year = matcher.group(2);
-                formattedDate = formattedDate + " " + year;
-                dates.set(i, formattedDate); // Update the value in the dates list
-            } else {
-                System.out.println("No match found.");
-            }
-        }
-        return dates;
-    }
-
-    public List<String> getAllDates() {
-        List<String> dates = new ArrayList<String>();
-        String filePath = filePathTextField.getText();
-        try {
-            File file = new File(filePath);
-            XSSFWorkbook workbook = new XSSFWorkbook(file);
-            Sheet sheet = workbook.getSheetAt(0);
-            int lastRowNum = sheet.getLastRowNum();
-            for (int i = 1; i <= lastRowNum; i++) {
-                Row row = sheet.getRow(i);
-                Cell cell = row.getCell(0);
-                if (cell != null) {
-                    String value = cell.getStringCellValue().strip();
-                    if (!value.isEmpty()) {
-                        dates.add(value);
-                    }
-                }
-            }
-            workbook.close();
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
-        return dates;
-    }
-
-    public List<Double> getHeaderValues(String headerName) {
-        List<Double> headerValues = new ArrayList<>();
-        String filePath = filePathTextField.getText();
-        try {
-            File file = new File(filePath);
-            XSSFWorkbook workbook = new XSSFWorkbook(file);
-            Sheet sheet = workbook.getSheetAt(0);
-            int lastRowNum = sheet.getLastRowNum();
-            Row row = sheet.getRow(0);
-            for (Cell cell : row) {
-                if (cell != null && cell.getStringCellValue().equals(headerName)) {
-                    int columnIndex = cell.getColumnIndex();
-                    for (int i = 1; i <= lastRowNum; i++) {
-                        row = sheet.getRow(i);
-                        cell = row.getCell(columnIndex);
-                        if (cell !=  null && cell.getCellType() == CellType.NUMERIC) {
-                            headerValues.add(cell.getNumericCellValue());
-                        }
-                    }
-                }
-            }
-            workbook.close();
-        } catch (Exception e) {
-            System.out.println("getHeaderValues Error: " + e.toString());
-        }
-        return headerValues;
-    }
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        StatisticsController statisticsController = new StatisticsController(lineChartContainer);
         filePathTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && !newValue.isEmpty()) {
                 String[] headers = readSpreadSheetHeaders().split(",");
@@ -133,43 +50,10 @@ public class SpreadSheetController implements Initializable {
 
                 // Create a line chart for each row header
                 for (String header : headers) {
-                    createLineChart(header);
+                    statisticsController.createLineChart(filePathTextField.getText(), header);
                 }
             }
         });
-    }
-
-    private void createLineChart(String header) {
-
-        List<Double> rowData = getHeaderValues(header);
-        CategoryAxis xAxis = new CategoryAxis();
-        NumberAxis yAxis = new NumberAxis();
-        List<String> dates = formatDates(getAllDates());
-
-        System.out.println("rowData.size(): " + rowData.size());
-        System.out.println("dates.size(): " + dates.size());
-        System.out.println("rowData: " + rowData);
-        System.out.println("dates: " + dates);
-        ObservableList<String> categories = FXCollections.observableArrayList(dates);
-        xAxis.setCategories(categories);
-        // Create a new LineChart
-        LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
-        lineChart.setTitle(header);
-
-        // Create a data series for the row
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName(header);
-
-        // Add data points to the series
-        for (int i = 0; i < rowData.size(); i++) {
-            series.getData().add(new XYChart.Data<>(dates.get(i), rowData.get(i)));
-        }
-
-        // Add the series to the line chart
-        lineChart.getData().add(series);
-
-        // Add the line chart to the container
-        lineChartContainer.getChildren().add(lineChart);
     }
 
     @FXML
@@ -187,26 +71,6 @@ public class SpreadSheetController implements Initializable {
     @FXML
     private void goHome(ActionEvent event) throws IOException {
         App.setRoot("main");
-    }
-
-    public void readSpreadSheet() {
-        try {
-            String filePath = filePathTextField.getText();
-            File file = new File(
-                    filePath);
-            System.out.println(file.getName());
-            // Workbook workbook = WorkbookFactory.create(file);
-            Workbook workbook = WorkbookFactory.create(file);
-            Sheet sheet = workbook.getSheetAt(0);
-            Row row = sheet.getRow(0);
-            Cell cell = row.getCell(0);
-            // System.out.println(cell.getStringCellValue());
-
-            workbook.close();
-        } catch (Exception e) {
-            System.out.println("Error reading spreadsheet" + e.toString() + ": " +
-                    e.getMessage());
-        }
     }
 
     @FXML

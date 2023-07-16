@@ -8,13 +8,13 @@
 <?import javafx.scene.control.ScrollPane?>
 <VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tracker.SpreadSheetController">
    <children>
-   
+        
         <Label text="FilePath:" />
         <TextField fx:id="filePathTextField" />
         <Button text="Select File" onAction="#selectFile" />
         <Label fx:id="headersFoundLabel" />
         <ScrollPane>
-        <VBox fx:id="lineChartContainer" spacing="20.0">
+        <VBox fx:id="lineChartContainer" spacing="10.0">
         </VBox>
         </ScrollPane>
    </children>
