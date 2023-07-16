@@ -1,0 +1,31 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: 17
+
+      - name: Change working directory
+        working-directory: ./daily-tracker
+
+      - name: Build with Maven
+        run: mvn clean install
+
+      - name: Run Tests
+        run: java -jar ../daily-tracker/lib/junit-platform-console-standalone-1.9.3.jar --class-path target/test-classes --scan-classpath
