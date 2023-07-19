@@ -42,21 +42,26 @@ public class SpreadSheetController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        StatisticsController statisticsController = new StatisticsController(lineChartContainer);
-        filePathTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && !newValue.isEmpty()) {
-                String[] headers = readSpreadSheetHeaders().split(",");
-                lineChartContainer.getChildren().clear(); // Clear existing line charts
+        if (location.getPath().endsWith("stats.fxml")) {
+            StatisticsController statisticsController = new StatisticsController(lineChartContainer);
+            filePathTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue != null && !newValue.isEmpty()) {
+                    String[] headers = readSpreadSheetHeaders().split(",");
+                    lineChartContainer.getChildren().clear(); // Clear existing line charts
 
-                // Create a line chart for each row header
-                for (String header : headers) {
-                    statisticsController.createLineChart(filePathTextField.getText(), header);
+                    // Create a line chart for each row header
+                    for (String header : headers) {
+                        statisticsController.createLineChart(filePathTextField.getText(), header);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     @FXML
+    /**
+     * Opens a file chooser to select a spreadsheet
+     */
     public void selectFile() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select File");
@@ -69,11 +74,20 @@ public class SpreadSheetController implements Initializable {
     }
 
     @FXML
+    /**
+     * Redirects to the main page
+     * 
+     * @param event
+     * @throws IOException if the main.fxml file is not found
+     */
     private void goHome(ActionEvent event) throws IOException {
         App.setRoot("main");
     }
 
     @FXML
+    /**
+     * Initialises the spreadsheet with the headers found in the headersFoundLabel
+     */
     public void initialiseSpreadSheet() {
         String filePath = filePathTextField.getText();
         String[] headers = headersFoundLabel.getText().split(",");
