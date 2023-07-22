@@ -8,7 +8,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,6 +26,9 @@ public class SpreadSheetController implements Initializable {
 
     @FXML
     private TextField filePathTextField;
+
+    @FXML
+    private TextField headersTextField;
 
     @FXML
     private Label headersFoundLabel;
@@ -40,6 +46,13 @@ public class SpreadSheetController implements Initializable {
     @FXML
     private VBox lineChartContainer;
 
+    private ArrayList<String> presetHeaders = new ArrayList<String>() {
+        {
+            add("Date");
+            add("Notes");
+        }
+    };
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         if (location.getPath().endsWith("stats.fxml")) {
@@ -47,11 +60,15 @@ public class SpreadSheetController implements Initializable {
             filePathTextField.textProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue != null && !newValue.isEmpty()) {
                     String[] headers = readSpreadSheetHeaders().split(",");
+
                     lineChartContainer.getChildren().clear(); // Clear existing line charts
 
                     // Create a line chart for each row header
                     for (String header : headers) {
-                        statisticsController.createLineChart(filePathTextField.getText(), header);
+                        if (!presetHeaders.contains(header)) {
+                            statisticsController.createLineChart(filePathTextField.getText(), header);
+                        }
+
                     }
                 }
             });
@@ -69,11 +86,15 @@ public class SpreadSheetController implements Initializable {
         File selectedFile = fileChooser.showOpenDialog(stage);
         if (selectedFile != null) {
             filePathTextField.setText(selectedFile.getAbsolutePath());
+        }
+        if (headersFoundLabel != null) {
             headersFoundLabel.setText(readSpreadSheetHeaders());
         }
+
     }
 
     @FXML
+
     /**
      * Redirects to the main page
      * 
@@ -90,15 +111,20 @@ public class SpreadSheetController implements Initializable {
      */
     public void initialiseSpreadSheet() {
         String filePath = filePathTextField.getText();
-        String[] headers = headersFoundLabel.getText().split(",");
+        String[] headers = headersTextField.getText().split(",");
         XSSFWorkbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Daily Tracker");
         Row row = sheet.createRow(0);
-        Cell cell = row.createCell(0);
-        cell.setCellValue("Date");
+        for (int i = 0; i < this.presetHeaders.size(); i++) {
+            Cell cell = row.createCell(i);
+            cell.setCellValue(presetHeaders.get(i));
+        }
+
+        int numberOfPresetHeaders = presetHeaders.size();
         int numberOfHeaders = headers.length;
+        Cell cell;
         for (int i = 0; i < numberOfHeaders; i++) {
-            cell = row.createCell(i + 1);
+            cell = row.createCell(i + numberOfPresetHeaders);
             cell.setCellValue(headers[i]);
         }
         try {
@@ -134,7 +160,7 @@ public class SpreadSheetController implements Initializable {
             Sheet sheet = workbook.getSheetAt(0);
             Row row = sheet.getRow(0);
             for (Cell cell : row) {
-                if (cell.getStringCellValue() != null && !cell.getStringCellValue().equals("Date")) {
+                if (cell.getStringCellValue() != null) {
                     headers = headers + cell.getStringCellValue() + ",";
                 }
             }
@@ -146,6 +172,15 @@ public class SpreadSheetController implements Initializable {
         return headers;
     }
 
+    private boolean isNumeric(String value) {
+        try {
+            Double.parseDouble(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     /**
      * 
      * @param filePath Path to the spreadsheet
@@ -153,17 +188,20 @@ public class SpreadSheetController implements Initializable {
      * @param values   Array of values to be added to the spreadsheet
      * @return boolean on whether the operation was successful
      */
-    public boolean addDailyUpdateController(String filePath, String date, String[] values) {
+    public boolean addDailyUpdateController(String filePath, String date, String[] values, String notes) {
         try {
             File file = new File(filePath);
             XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(filePath));
             Sheet sheet = workbook.getSheetAt(0);
             int lastRowNum = sheet.getLastRowNum();
             Row row = sheet.createRow(lastRowNum + 1);
+            // create a cell for each of the preset headers
             row.createCell(0).setCellValue(date);
+            row.createCell(1).setCellValue(notes);
             int numberOfValues = values.length;
 
-            for (int i = 0; i < numberOfValues; i++) {
+            // starts at index 1 of the values array because index 0 is the notes
+            for (int i = 1; i < numberOfValues; i++) {
                 Cell cell = row.createCell(i + 1);
                 if (isNumeric(values[i])) {
                     double numericValue = Double.parseDouble(values[i]);
@@ -184,15 +222,6 @@ public class SpreadSheetController implements Initializable {
         }
     }
 
-    private boolean isNumeric(String value) {
-        try {
-            Double.parseDouble(value);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
     /**
      * Wrapper around addDailyUpdateController to add a daily update with the
      * current date
@@ -204,8 +233,9 @@ public class SpreadSheetController implements Initializable {
     public void addDailyUpdateDefault() {
         String filePath = filePathTextField.getText();
         String[] values = valuesTextField.getText().split(",");
+        String notes = values[0];
         Date date = new Date();
-        boolean success = addDailyUpdateController(filePath, date.toString(), values);
+        boolean success = addDailyUpdateController(filePath, date.toString(), values, notes);
         if (success) {
             updateDailyMessageLabel.setText("Daily update added successfully");
         } else {

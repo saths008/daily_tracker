@@ -14,7 +14,7 @@
          <TextField fx:id="filePathTextField" />
          <Button text="Select File" onAction="#selectFile" />
 
-      <Label text="Column Titles (Date is included by default):" />
+      <Label text="Column Titles (Date and Notes are included by default):" />
       <TextField fx:id="headersTextField" />
 
       <Button text="Submit" onAction="#initialiseSpreadSheet"/>

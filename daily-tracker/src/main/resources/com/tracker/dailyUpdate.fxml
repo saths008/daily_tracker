@@ -17,6 +17,8 @@
          <Label text="Headers Found:"/>
       <Label fx:id="headersFoundLabel" />
       <Label text="Values:" />
+       <Label text="Date is entered automatically" />
+      <Label text="Enter values separated by commas" />
       <TextField fx:id="valuesTextField" />
 
       <Button text="Submit" onAction="#addDailyUpdateDefault"/>

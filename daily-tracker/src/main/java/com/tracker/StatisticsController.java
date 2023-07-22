@@ -15,6 +15,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
 
 public class StatisticsController {
@@ -102,12 +103,12 @@ public class StatisticsController {
         for (int i = 0; i < rowData.size(); i++) {
             series.getData().add(new XYChart.Data<>(dates.get(i), rowData.get(i)));
         }
-
         // Add the series to the line chart
         lineChart.getData().add(series);
 
         // Add the line chart to the container
         lineChartContainer.getChildren().add(lineChart);
+
     }
 
     public List<String> formatDates(List<String> dates) {
